@@ -1,4 +1,6 @@
 class CatsController < ApplicationController
+  before_action :ensure_logged_in, only: [:new, :create]
+
   def index
     @cats = Cat.all
     render :index
@@ -15,7 +17,10 @@ class CatsController < ApplicationController
   end
 
   def create
-    @cat = Cat.new(cat_params)
+    cat_info = cat_params
+    cat_info[:user_id] = current_user.id
+    @cat = Cat.new(cat_info)
+
     if @cat.save
       redirect_to cat_url(@cat)
     else
